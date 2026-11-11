@@ -1,0 +1,829 @@
+<title>E-Cycle Trace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: tabbed manifest-style tool. Assess | Places and timings | Tracker | Swap board | Campus impact | Learn | About and data. */
+:root{
+  --bg:#EDF0EC; --surface:#F8FAF7; --ink:#14201C; --muted:#55645E; --line:#C9D2CC;
+  --accent:#0B6B52; --accent-ink:#FFFFFF; --warn:#9A4F00; --warn-bg:#F7E6CF; --ok-bg:#D8EBE2; --bad:#A32D2D;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1613; --surface:#17211D; --ink:#E6EEE9; --muted:#93A39B; --line:#2B3A34;
+  --accent:#4CC9A0; --accent-ink:#06231A; --warn:#F0A64A; --warn-bg:#3A2A10; --ok-bg:#183A2E; --bad:#F08A8A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --surface:#17211D; --ink:#E6EEE9; --muted:#93A39B; --line:#2B3A34;
+  --accent:#4CC9A0; --accent-ink:#06231A; --warn:#F0A64A; --warn-bg:#3A2A10; --ok-bg:#183A2E; --bad:#F08A8A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,6vw,54px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:24px;font-weight:700;letter-spacing:-.01em}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+header p.lead{max-width:62ch;color:var(--muted);font-size:17px}
+.pill{align-self:flex-start;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--surface);color:var(--muted)}
+.pill.ok{color:var(--accent);border-color:var(--accent)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{background:transparent;color:var(--muted);border:0;border-bottom:3px solid transparent;border-radius:0;padding:10px 14px;font-weight:600;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.pane{display:flex;flex-direction:column;gap:20px}
+.pane[hidden],[hidden]{display:none!important}
+.grid2{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:20px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.field{display:flex;flex-direction:column;gap:5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label,.lbl{font-size:12px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+select,input[type=number],input[type=text],input[type=date],input[type=time],input[type=password]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:9px 10px;width:100%;min-width:0}
+select:focus-visible,input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--body)}
+.check input{width:16px;height:16px;accent-color:var(--accent)}
+.check.off{opacity:.45}
+button{font:inherit;cursor:pointer;border-radius:4px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-weight:600}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+.slip{border:1.5px dashed var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:16px;background:var(--surface);min-width:0}
+.slip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:4px 9px;border-radius:3px;background:var(--ok-bg);color:var(--accent);white-space:nowrap}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.verdict{font-family:var(--display);font-size:28px;font-weight:800;line-height:1.1}
+.why{color:var(--muted)}
+ul.steps{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.sec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:6px 8px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.centre{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.centre small{display:block;color:var(--muted)}
+.dist{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+.stat b{display:block;font-family:var(--display);font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:13px}
+.bar i{display:block;height:10px;background:var(--accent);border-radius:2px}
+.bar em{font-style:normal;font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:12px}
+.item{border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.item-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns button{padding:6px 10px;font-size:13px}
+.mono{font-family:var(--mono);font-size:13px}
+pre.rc{margin:0;font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px;overflow-x:auto}
+.track{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.stg{font-size:11px;font-family:var(--mono);color:var(--muted);border-top:4px solid var(--line);padding-top:5px;text-transform:uppercase;letter-spacing:.03em}
+.stg.done{border-color:var(--accent);color:var(--ink)}
+@media (max-width:520px){.stg{font-size:9px}.bar{grid-template-columns:84px 1fr 56px}}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch}
+.flow .arrow{align-self:center;font-family:var(--mono);font-size:22px;color:var(--accent)}
+@media (max-width:820px){.flow{grid-template-columns:minmax(0,1fr)}.flow .arrow{transform:rotate(90deg);justify-self:center}}
+.flow .panel ul,.panel ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.tech{display:flex;flex-wrap:wrap;gap:8px}
+.tech span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:3px;padding:3px 8px;background:var(--surface)}
+.map{width:100%;height:auto;background:var(--bg);border:1px solid var(--line);border-radius:4px;display:block}
+.mc{fill:var(--surface);stroke:var(--muted);stroke-width:1.5}
+.mc.on{fill:var(--accent);stroke:var(--accent)}
+.me{fill:var(--ink)}
+.mt{font:11px var(--mono);fill:var(--ink)}
+.ml{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3;fill:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;margin-right:5px;border:1.5px solid var(--muted);background:var(--surface)}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.me{background:var(--ink);border-color:var(--ink);border-radius:50%}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.mat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.mat div{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.mat b{display:block;font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums}
+.mat span{font-size:12px;color:var(--muted)}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{background:transparent;color:var(--ink);border:1px solid var(--line);text-align:left;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--ok-bg);color:var(--accent);border-color:var(--accent)}
+.opt.wrong{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.opt:disabled{opacity:1;cursor:default}
+.drive{display:flex;flex-direction:column;gap:6px}
+.dates{display:flex;gap:6px;flex-wrap:wrap}
+.notice{border:1px solid var(--warn);background:var(--warn-bg);color:var(--ink);border-radius:6px;padding:12px 16px}
+.hdr{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stack{display:flex;flex-direction:column;gap:20px}
+.pt{display:grid;grid-template-columns:minmax(150px,1.5fr) 1fr 1fr auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+@media (max-width:640px){.pt{grid-template-columns:1fr 1fr}.pt .nm{grid-column:1/-1}}
+.dates span{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:3px;padding:2px 8px;background:var(--bg)}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">EVS Assignment · BCS508 · Prototype</span>
+  <h1>E-Cycle Trace</h1>
+  <p class="lead">Log a discarded electronic item. The system decides whether to reuse, repair or recycle it, shows where and when to take it, books a pickup slot, tracks it until its materials are recovered, and scores every department on campus.</p>
+  <div class="hdr"><span class="pill" id="store">Connecting to storage…</span><span class="pill" id="role">Customer view</span><button type="button" class="ghost" id="roleBtn" data-role="1" style="padding:3px 12px;font-size:13px">Admin sign in</button></div>
+</header>
+
+<div class="tabs" role="tablist" id="tabs">
+  <button role="tab" data-tab="assess" aria-selected="true">Assess</button>
+  <button role="tab" data-tab="places" aria-selected="false">Places and timings</button>
+  <button role="tab" data-tab="tracker" aria-selected="false">Tracker</button>
+  <button role="tab" data-tab="swap" aria-selected="false">Swap board</button>
+  <button role="tab" data-tab="campus" aria-selected="false">Campus impact</button>
+  <button role="tab" data-tab="learn" aria-selected="false">Learn</button>
+  <button role="tab" data-tab="admin" aria-selected="false">Admin</button>
+  <button role="tab" data-tab="about" aria-selected="false">About and data</button>
+</div>
+
+<div class="notice" id="notice" hidden></div>
+
+<!-- ASSESS -->
+<section class="pane" id="pane-assess">
+  <div class="grid2">
+    <form class="panel" id="f" autocomplete="off">
+      <div><span class="eyebrow">Step 1</span><h2>Log an item</h2></div>
+      <div class="field"><label for="dev">Device</label><select id="dev"></select></div>
+      <div class="row">
+        <div class="field"><label for="qty">Quantity</label><input id="qty" type="number" min="1" max="50" value="2"></div>
+        <div class="field"><label for="age">Age (years)</label><input id="age" type="number" min="0" max="20" value="6"></div>
+      </div>
+      <div class="field"><label for="cond">Condition</label>
+        <select id="cond">
+          <option value="working">Works normally</option>
+          <option value="minor">Minor fault (screen, key, charger port)</option>
+          <option value="dead" selected>Dead / not repairable</option>
+        </select></div>
+      <div class="row" id="quoteRow" hidden>
+        <div class="field"><label for="rq">Repair quote (₹)</label><input id="rq" type="number" min="0" placeholder="optional"></div>
+        <div class="field"><label for="np">New device price (₹)</label><input id="np" type="number" min="0" placeholder="optional"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="area">Your area</label><select id="area"></select></div>
+        <div class="field"><label for="dept">Department</label><select id="dept"></select></div>
+      </div>
+      <label class="check" id="swLbl"><input type="checkbox" id="sw"> Battery is swollen, hot or leaking</label>
+      <div class="field"><label for="hand">Handover</label>
+        <select id="hand"><option value="drop">I will drop it off</option><option value="pickup">Request a pickup</option></select></div>
+      <div class="row" id="pkRow" hidden>
+        <div class="field"><label for="pdate">Pickup date</label><input id="pdate" type="date"></div>
+        <div class="field"><label for="pslot">Time slot</label><select id="pslot"><option value="10:00–12:00">10:00–12:00</option><option value="12:00–14:00">12:00–14:00</option><option value="14:00–16:00">14:00–16:00</option></select></div>
+      </div>
+      <p class="note" id="pkHint"></p>
+      <button type="submit" id="mk">Create tracking manifest</button>
+      <p class="note" id="msg" aria-live="polite">The decision updates as you change the inputs.</p>
+    </form>
+    <div class="slip" id="slip" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- PLACES -->
+<section class="pane" id="pane-places" hidden>
+  <div class="panel">
+    <div><span class="eyebrow">Where and when</span><h2>Drop points and opening hours</h2></div>
+    <div class="filters">
+      <div class="field"><label for="parea">Distance from</label><select id="parea"></select></div>
+      <div class="field"><label for="pfilter">Show</label>
+        <select id="pfilter"><option value="all">All points</option><option value="open">Open now</option><option value="bat">Accepts batteries</option><option value="reuse">Accepts reuse items</option></select></div>
+    </div>
+    <p class="note" id="clock"></p>
+    <div class="cards" id="places"></div>
+    <p class="note">Sample places and hours for the prototype. The full system reads the official authorised-recycler list with their real hours.</p>
+  </div>
+  <div class="panel">
+    <h2>Collection drives</h2>
+    <p class="why">Recurring collection events. The next dates are worked out from today's date.</p>
+    <div class="cards" id="drives"></div>
+    <div class="sec"><h3>Pickup service</h3>
+      <p>Monday to Saturday, three slots a day (10:00–12:00, 12:00–14:00, 14:00–16:00). Each slot takes at most 3 bookings, so a slot shows as full once three manifests have booked it. No pickups on Sundays.</p></div>
+  </div>
+</section>
+
+<!-- TRACKER -->
+<section class="pane" id="pane-tracker" hidden>
+  <div class="panel">
+    <div><span class="eyebrow">Step 2</span><h2>Track a manifest</h2></div>
+    <div class="field"><label for="tid">Find by manifest ID</label><input id="tid" type="text" placeholder="e.g. ECT-2611-0412"></div>
+    <div class="list" id="found"></div>
+  </div>
+  <div class="panel">
+    <h2 id="trkTitle">My manifests</h2>
+    <div class="stats" id="stats"></div>
+    <div class="sec"><h3>Kilograms logged by device</h3><div class="bars" id="bars"></div></div>
+    <div class="sec">
+      <div class="filters">
+        <div class="field"><label for="fdept">Department</label><select id="fdept"></select></div>
+        <div class="field"><label for="fstat">Status</label><select id="fstat"><option value="all">All</option><option value="prog">In progress</option><option value="done">Complete</option></select></div>
+      </div>
+      <div class="btns" id="exportRow" hidden><button type="button" class="ghost" data-export="1">Export as CSV</button></div>
+      <div class="list" id="items"></div>
+      <p class="note" id="trkNote"></p></div>
+  </div>
+</section>
+
+<!-- SWAP -->
+<section class="pane" id="pane-swap" hidden>
+  <div class="panel">
+    <div><span class="eyebrow">Reuse loop</span><h2>Campus swap board</h2></div>
+    <p class="why">Working devices that the engine marks for reuse or refurbishing can be listed here, so a junior, lab or club can claim them before they become waste. Use the Assess tab and press "List on swap board".</p>
+    <div class="cards" id="swapList"></div>
+  </div>
+</section>
+
+<!-- CAMPUS -->
+<section class="pane" id="pane-campus" hidden>
+  <div class="panel">
+    <div><span class="eyebrow">Analytics</span><h2>Campus impact</h2></div>
+    <div class="stats" id="cstats"></div>
+    <div class="sec"><h3>Expected material recovery from logged items</h3><div class="mat" id="cmat"></div>
+      <p class="note" id="cnote"></p></div>
+  </div>
+  <div class="panel">
+    <h2>Department leaderboard</h2>
+    <p class="why">Eco points = kg × action weight (reuse 12, refurbish 10, repair 10, hazard hold 8, recycle 6), plus 20% once the item reaches Recovered. Reuse scores higher because it prevents waste instead of treating it.</p>
+    <div class="bars" id="lead"></div>
+  </div>
+</section>
+
+<!-- LEARN -->
+<section class="pane" id="pane-learn" hidden>
+  <div class="cols">
+    <div class="panel"><h2>Do</h2>
+      <ul class="steps">
+        <li>Back up and factory-reset phones, laptops and PCs before handing them over.</li>
+        <li>Hand e-waste only to authorised collectors or recyclers.</li>
+        <li>Keep batteries inside the device unless they come out safely.</li>
+        <li>Donate or swap working devices before they become waste.</li></ul></div>
+    <div class="panel"><h2>Don't</h2>
+      <ul class="steps">
+        <li>Don't burn cables or boards to get at the copper. It releases toxic fumes.</li>
+        <li>Don't open monitors, tubes or batteries yourself.</li>
+        <li>Don't put e-waste in the normal dry-waste bin.</li>
+        <li>Don't keep swollen batteries charging or in a bag.</li></ul></div>
+    <div class="panel"><h2>The rules</h2>
+      <p>India's E-Waste (Management) Rules, 2022 use Extended Producer Responsibility: producers, manufacturers and importers must make sure the electronics they sell are collected and recycled by authorised recyclers. A system like this makes that chain easy for the user and visible to auditors.</p></div>
+  </div>
+  <div class="panel">
+    <div><span class="eyebrow">Check yourself</span><h2>E-waste quiz</h2></div>
+    <p class="note" id="qscore"></p>
+    <div class="list" id="quiz"></div>
+    <div class="btns"><button type="button" class="ghost" data-qreset="1">Start again</button></div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="pane" id="pane-admin" hidden>
+  <div class="panel" id="adminLogin">
+    <div><span class="eyebrow">Restricted</span><h2>Admin sign in</h2></div>
+    <p class="why">For the campus e-waste coordinator or the recycler. Admins update tracking stages, manage pickups, post notices and edit drop-point hours.</p>
+    <form id="pinForm" class="field" autocomplete="off"><label for="pin">Admin PIN</label>
+      <div class="row"><input id="pin" type="password" inputmode="numeric" placeholder="Enter PIN"><button type="submit">Sign in</button></div></form>
+    <p class="note" id="pinMsg">Demo PIN: 2026. This is a demonstration only. The PIN is visible in the page code, so it is not real security. A full version would use proper accounts.</p>
+  </div>
+  <div class="stack" id="adminConsole" hidden>
+    <div class="panel"><div><span class="eyebrow">Admin</span><h2>Notice for customers</h2></div>
+      <div class="field"><label for="ntext">Message shown at the top of the site</label><input id="ntext" type="text" maxlength="160" placeholder="e.g. Saturday's drive moves to Sunday 10:00–14:00"></div>
+      <div class="btns"><button type="button" data-npub="1">Publish notice</button><button type="button" class="ghost" data-nclr="1">Clear notice</button></div></div>
+    <div class="panel"><h2>Pickup queue</h2><p class="why">Pending pickups by date and slot. Press Advance stage when an item has been collected or has moved on.</p><div class="list" id="pickQ"></div></div>
+    <div class="panel"><h2>Hazard watch</h2><p class="why">Swollen or leaking batteries that are not yet processed. Handle these first.</p><div class="list" id="hazQ"></div></div>
+    <div class="panel"><h2>Drop-point hours</h2><p class="why">Change opening and closing times, or mark a point closed. Customers see the change straight away.</p><div id="ptEd"></div></div>
+    <div class="panel"><h2>Shortcuts</h2><div class="btns"><button type="button" class="ghost" data-goto="tracker">All manifests</button><button type="button" class="ghost" data-goto="campus">Campus impact</button><button type="button" class="ghost" data-export="1">Export as CSV</button></div>
+      <p class="note" id="amsg" aria-live="polite"></p></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="pane" id="pane-about" hidden>
+  <div class="panel">
+    <div><span class="eyebrow">Storage</span><h2>Where the data is stored</h2></div>
+    <p id="dataLive"></p>
+    <div class="cols">
+      <div><h3>What is saved</h3>
+        <ul class="steps"><li><b>manifests</b>: ID, device, quantity, kg, action, stage, drop point, department, pickup date and slot, time created.</li>
+        <li><b>swaps</b>: swap-board listings and whether they are claimed.</li>
+        <li>No names, emails or phone numbers are stored.</li></ul></div>
+      <div><h3>Who can see and change it</h3>
+        <ul class="steps"><li>Anyone who can open this page can read the records.</li>
+        <li>Contributors and Editors of the page can add and change records. View-only people can read only.</li>
+        <li>Inside the page, a customer sees only their own manifests. An admin (demo PIN) sees all, moves items through the stages and edits hours. The PIN is a demo, not real security.</li>
+        <li>The data stays when the page is updated, and is erased if the page is deleted.</li></ul></div>
+      <div><h3>If the shared database is not available</h3>
+        <ul class="steps"><li>The page falls back to this browser's own storage (localStorage), visible only to you on this device.</li>
+        <li>The top of the page always tells you which one is in use.</li></ul></div>
+    </div>
+    <p class="note" id="counts"></p>
+  </div>
+
+  <h2>How the system works</h2>
+  <div class="flow">
+    <div class="panel"><h3>Input</h3><ul>
+      <li>Device type, quantity, age, condition</li>
+      <li>Battery state, optional repair quote and new price</li>
+      <li>Area, department, handover choice, pickup date and slot</li>
+      <li>Drop point list with coordinates and opening hours</li>
+      <li>Typical material composition table per device</li></ul></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="panel"><h3>Processing</h3><ul>
+      <li>Rule engine picks Reuse, Repair, Refurbish, Hazard hold or Recycle</li>
+      <li>Weight × composition gives recoverable material and CO₂e estimate</li>
+      <li>Haversine distance ranks capable drop points; hours give open-now status</li>
+      <li>Slot capacity check, manifest stored, eco points computed</li></ul></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="panel"><h3>Output</h3><ul>
+      <li>Action, reason and safe-handling checklist</li>
+      <li>Map, hours, directions link, pickup booking</li>
+      <li>Tracking timeline, receipt, CSV export, swap listing</li>
+      <li>Campus dashboard and department leaderboard</li></ul></div>
+  </div>
+  <div class="tech"><span>Web application (HTML/JS)</span><span>GIS distance (Haversine)</span><span>Rule-based decision engine</span><span>Shared document database</span><span>Data analytics dashboard</span></div>
+  <div class="cols">
+    <div class="panel"><h2>Expected environmental benefits</h2>
+      <ul class="steps">
+        <li>Fewer devices dumped in landfills or burned in the open, so lead, mercury, cadmium and brominated flame retardants stay out of soil and water.</li>
+        <li>Working and repairable devices stay in use longer, which avoids the energy and mining needed to make new ones.</li>
+        <li>Copper, aluminium, silver, gold and cobalt return to the supply chain as secondary raw material.</li>
+        <li>Swollen or leaking batteries are flagged early, which lowers fire and toxic-leak risk.</li>
+        <li>Tracking IDs and stage status make informal scrap handling visible and support audits under e-waste rules.</li></ul></div>
+    <div class="panel"><h2>Future scope</h2>
+      <ul class="steps">
+        <li>Photo upload with an image classifier that identifies the device type and visible damage.</li>
+        <li>QR labels on each item, scanned at every stage.</li>
+        <li>IoT bins that report fill level so pickups are scheduled automatically.</li>
+        <li>Live feed of the authorised recycler list from the pollution control authorities.</li></ul></div>
+  </div>
+  <div class="panel"><h2>Limits of this prototype</h2>
+    <p>Drop points, hours and drives are made-up sample entries. Material and CO₂e figures are rough per-unit estimates for typical devices, meant for comparison only. A full version would use the official recycler list and measured composition data from recyclers.</p></div>
+</section>
+</div>
+
+<script>
+/* ---------- data ---------- */
+// mat = indicative grams per unit; kg = typical unit mass
+const DEV={
+ phone:{n:'Smartphone',kg:.17,bat:1,data:1,mat:{Copper:15,Aluminium:20,'Iron / steel':20,Plastics:35,Cobalt:5,Silver:.3,Gold:.03},haz:'Li-ion battery; lead in solder'},
+ laptop:{n:'Laptop',kg:2.2,bat:1,data:1,mat:{Copper:110,Aluminium:280,'Iron / steel':400,Plastics:450,Cobalt:40,Silver:.9,Gold:.05},haz:'Li-ion battery; brominated flame retardants'},
+ pc:{n:'Desktop CPU',kg:9,bat:0,data:1,mat:{Copper:500,Aluminium:900,'Iron / steel':5000,Plastics:1500,Silver:1.5,Gold:.2},haz:'Lead solder; capacitors'},
+ monitor:{n:'LCD monitor',kg:4.5,bat:0,data:0,mat:{Copper:150,Aluminium:300,'Iron / steel':900,Plastics:1400,Silver:.3},haz:'Mercury in older backlights'},
+ printer:{n:'Printer',kg:6,bat:0,data:0,mat:{Copper:120,Aluminium:100,'Iron / steel':1500,Plastics:3000},haz:'Toner residue'},
+ board:{n:'Lab circuit boards',kg:.3,bat:0,data:0,mat:{Copper:60,Aluminium:10,Plastics:90,Silver:.2,Gold:.04},haz:'Lead and tin solder'},
+ pbank:{n:'Power bank / Li-ion pack',kg:.25,bat:1,data:0,mat:{Copper:25,Aluminium:20,Cobalt:35,Lithium:3,Plastics:20},haz:'Fire risk; electrolyte'},
+ charger:{n:'Chargers and cables',kg:.15,bat:0,data:0,mat:{Copper:40,Plastics:80},haz:'Low'}
+};
+// Rough kg CO2e avoided per kg of recycled vs virgin material (assumption, comparison only)
+const CF={Aluminium:9,Copper:3,'Iron / steel':1.5,Plastics:1.5};
+const AREAS={ 'JP Nagar':[12.9063,77.5857],'Jayanagar':[12.9250,77.5938],'Koramangala':[12.9352,77.6245],
+ 'Whitefield':[12.9698,77.7500],'Yelahanka':[13.1007,77.5963],'Electronic City':[12.8452,77.6602] };
+const DEPTS=['CSE','ISE','ECE','EEE','Mechanical','Civil','Hostel / Admin'];
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=[1,2,3,4,5,6], MF=[1,2,3,4,5], TS=[2,3,4,5,6,0];
+// Sample points only (not real facilities). hrs.d = open weekdays (0 = Sunday)
+const CENTRES=[
+ {n:'Sample Drop Point A',s:'Campus library lobby, JP Nagar side',ll:[12.9010,77.5700],bat:1,reuse:1,hrs:{d:MON,o:'09:00',c:'18:00'}},
+ {n:'Sample Drop Point B',s:'Ward office annex, Koramangala',ll:[12.9300,77.6100],bat:0,reuse:1,hrs:{d:MF,o:'10:00',c:'16:00'}},
+ {n:'Sample Drop Point C',s:'Tech park gate 2, Whitefield',ll:[12.9800,77.7300],bat:1,reuse:0,hrs:{d:MF,o:'09:30',c:'17:30'}},
+ {n:'Sample Drop Point D',s:'Community hall, Yelahanka',ll:[13.0900,77.5900],bat:0,reuse:1,hrs:{d:TS,o:'10:00',c:'15:00'}},
+ {n:'Sample Drop Point E',s:'Industrial estate yard, Electronic City',ll:[12.8500,77.6700],bat:1,reuse:0,hrs:{d:MON,o:'08:00',c:'16:00'}},
+ {n:'Sample Drop Point F',s:'Market road shop unit, Jayanagar',ll:[12.9200,77.5800],bat:0,reuse:0,hrs:{d:MON,o:'10:00',c:'20:00'}},
+ {n:'Sample Drop Point G',s:'Mall service desk, Koramangala',ll:[12.9400,77.6300],bat:1,reuse:1,hrs:{d:[0,1,2,3,4,5,6],o:'11:00',c:'21:00'}},
+ {n:'Sample Drop Point H',s:'Metro station kiosk, Whitefield',ll:[12.9650,77.7480],bat:0,reuse:0,hrs:{d:[0,1,2,3,4,5,6],o:'07:00',c:'20:00'}},
+ {n:'Sample Drop Point I',s:'Government school office, Yelahanka',ll:[13.1000,77.5950],bat:1,reuse:1,hrs:{d:MF,o:'09:00',c:'16:00'}},
+ {n:'Sample Drop Point J',s:'Shopping complex, Jayanagar',ll:[12.9300,77.5900],bat:1,reuse:0,hrs:{d:MON,o:'10:00',c:'19:00'}}
+];
+// Recurring drives. nth: nth-of-month weekday; wk: every weekday; last: last weekday of month
+const DRIVES=[
+ {n:'Monthly campus drive',rule:'First Saturday of every month',time:'10:00–14:00',at:'Sample Drop Point A',what:'All devices. Batteries accepted.',first:6},
+ {n:'Battery and small-item day',rule:'Every Wednesday',time:'14:00–17:00',at:'Sample Drop Point E',what:'Batteries, chargers, cables, power banks.',wk:3},
+ {n:'Tech park lunch collection',rule:'Last Friday of every month',time:'12:30–15:00',at:'Sample Drop Point C',what:'Laptops, phones and peripherals.',last:5}
+];
+const STAGES=['Logged','Collected','Transported','Dismantled','Recovered'];
+const ACT={hold:{t:'Hazard hold',f:8},reuse:{t:'Reuse or donate',f:12},refurb:{t:'Refurbish',f:10},repair:{t:'Repair first',f:10},recycle:{t:'Recycle',f:6}};
+const CAP=3;
+const QZ=[
+ {q:'A phone battery has swollen. What is the safest next step?',o:['Keep charging it to see if it settles','Puncture it to release the gas','Stop using it and take it to a battery-capable drop point','Put it in the dry-waste bin'],a:2,e:'A swollen lithium-ion battery can catch fire. Stop charging it, keep it away from heat and hand it to a point that accepts batteries.'},
+ {q:'In this prototype\'s data, which material makes up the biggest share of a desktop CPU by weight?',o:['Copper','Iron / steel','Gold','Plastics'],a:1,e:'Iron and steel, mostly the casing and frame, are the heaviest part. Gold is tiny by weight but valuable.'},
+ {q:'Under India\'s E-Waste (Management) Rules, 2022, who carries Extended Producer Responsibility?',o:['Only the final user','Only the municipality','Producers, manufacturers and importers','Only scrap dealers'],a:2,e:'EPR puts the duty to arrange collection and recycling on those who put electronics on the market.'},
+ {q:'Why should you never burn cables to get the copper?',o:['The copper melts away','It releases toxic fumes from the plastic coating','It is illegal to own copper','It makes the copper heavier'],a:1,e:'Burning insulation releases harmful smoke, including dioxins. Authorised recyclers strip cables safely.'},
+ {q:'Which gives the biggest benefit for a working three-year-old laptop?',o:['Recycle it now','Store it in a drawer','Reuse it or pass it on','Burn it'],a:2,e:'Reuse avoids making a new device and postpones waste, which is why it scores highest on the leaderboard.'}
+];
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+function ist(){
+ const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',weekday:'short',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
+ const o={};p.forEach(x=>o[x.type]=x.value);
+ return{wd:DN.indexOf(o.weekday),min:(+o.hour%24)*60+ +o.minute,y:+o.year,m:+o.month,d:+o.day,hh:String(+o.hour%24).padStart(2,'0'),mm:o.minute};
+}
+function km(a,b){const R=6371,r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);
+ const h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+function fmt(g){return g>=1000?(g/1000).toFixed(2)+' kg':g>=1?Math.round(g)+' g':Math.round(g*1000)+' mg';}
+function co2(key,qty){let s=0;for(const[m,g]of Object.entries(DEV[key].mat))if(CF[m])s+=g*qty*CF[m]/1000;return s;}
+function dayRange(d){const a=[...new Set(d.map(x=>x===0?7:x))].sort((x,y)=>x-y);const nm=x=>DN[x%7];
+ if(a.length===7)return 'Every day';const ok=a.every((x,i)=>i===0||x===a[i-1]+1);
+ return ok?(a.length===1?nm(a[0]):nm(a[0])+'–'+nm(a[a.length-1])):a.map(nm).join(', ');}
+function openState(c){
+ if(c.off)return{open:0,t:'Temporarily closed'};
+ const t=ist(),h=c.hrs,[oh,om]=h.o.split(':').map(Number),[ch,cm]=h.c.split(':').map(Number),o=oh*60+om,cl=ch*60+cm;
+ if(h.d.includes(t.wd)&&t.min>=o&&t.min<cl)return{open:1,t:'Open now · closes '+h.c};
+ for(let i=0;i<8;i++){const wd=(t.wd+i)%7;if(!h.d.includes(wd))continue;if(i===0&&t.min>=cl)continue;
+  return{open:0,t:'Closed · opens '+(i===0?'today':i===1?'tomorrow':DN[wd])+' '+h.o};}
+ return{open:0,t:'Closed'};
+}
+function nextDrives(r,n){
+ const t=ist(),out=[];
+ for(let i=0;i<150&&out.length<n;i++){
+  const dt=new Date(Date.UTC(t.y,t.m-1,t.d+i)),wd=dt.getUTCDay(),dd=dt.getUTCDate();
+  const dim=new Date(Date.UTC(dt.getUTCFullYear(),dt.getUTCMonth()+1,0)).getUTCDate();
+  let ok=false;
+  if(r.wk!==undefined)ok=wd===r.wk;
+  else if(r.first!==undefined)ok=wd===r.first&&dd<=7;
+  else if(r.last!==undefined)ok=wd===r.last&&dd+7>dim;
+  if(ok)out.push(dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}));
+ }
+ return out;
+}
+function isoPlus(n){const t=ist();return new Date(Date.UTC(t.y,t.m-1,t.d+n)).toISOString().slice(0,10);}
+function dmy(iso){return new Date(iso+'T00:00:00Z').toLocaleDateString('en-IN',{day:'numeric',month:'short',timeZone:'UTC'});}
+const dirLink=c=>`https://www.google.com/maps/dir/?api=1&destination=${c.ll[0]},${c.ll[1]}`;
+
+/* ---------- logic ---------- */
+function decide(d,age,cond,sw,rq,np){
+ if(sw&&d.bat)return{k:'hold',t:'Hazard hold',w:true,why:'A swollen or leaking battery can catch fire. It must not be charged, thrown in a bin or carried loose.',
+  steps:['Stop using and charging the device','Place it in a metal or ceramic container with sand or an inert filler','Keep it away from heat and people, outdoors if possible','Hand it to a battery-capable drop point as soon as you can']};
+ if(cond==='working'&&age<=5)return{k:'reuse',t:'Reuse or donate',why:'It works and is not old. Giving it a second user is the most effective way to reduce e-waste.',
+  steps:['Remove accessories you still need','List it on the swap board or offer it to a lab, NGO or school','Use a drop point that accepts reuse items if no taker is found']};
+ if(cond==='working')return{k:'refurb',t:'Refurbish',why:'It still works but is old. A refurbisher can upgrade it or resell it for basic use or parts.',
+  steps:['Clean the device and remove personal accounts','List it on the swap board or hand it to the college hardware lab','If no one wants it, move to recycling']};
+ if(cond==='minor'&&age<=7){
+  if(rq>0&&np>0&&rq>=.5*np)return{k:'recycle',t:'Recycle at an authorised facility',why:`The repair quote (₹${rq}) is ${Math.round(rq/np*100)}% of a new device (₹${np}). Above 50% repair is rarely worth it, so the device goes to recycling.`,
+   steps:['Keep the battery inside unless it can be removed safely','Drop at a suitable point or request a pickup','Never sell to unregistered scrap collectors']};
+  const extra=rq>0&&np>0?` The quote is ${Math.round(rq/np*100)}% of a new device, which is acceptable.`:'';
+  return{k:'repair',t:'Repair first',why:'A minor fault on a fairly young device is cheaper and greener to repair than to replace.'+extra,
+  steps:['Get a repair estimate from a local technician (or enter it on the left)','Repair if the cost is below half the price of a new device','If repair fails, log it again for recycling']};}
+ return{k:'recycle',t:'Recycle at an authorised facility',why:'The device is too old or too damaged to reuse. Authorised recycling recovers metals and handles hazardous parts safely.',
+  steps:['Do not break open the device or burn cables','Keep the battery inside unless it can be removed safely','Drop at a suitable point or request a pickup','Never sell to unregistered scrap collectors']};
+}
+function eligible(d,dec){
+ let f=CENTRES.filter(c=>{
+  if(['reuse','refurb','repair'].includes(dec.k)&&!c.reuse)return false;
+  if((dec.k==='hold'||d.bat)&&!c.bat)return false;
+  return true;});
+ return f.length?f:CENTRES.slice();
+}
+function nearest(d,dec,ll){return eligible(d,dec).map(c=>({...c,d:km(ll,c.ll)})).sort((a,b)=>a.d-b.d).slice(0,3);}
+function mapSvg(ll,near){
+ const W=360,H=240,p=28,all=[ll,...CENTRES.map(c=>c.ll)];
+ const la=all.map(q=>q[0]),lo=all.map(q=>q[1]);
+ const a=Math.min(...la),b=Math.max(...la),c=Math.min(...lo),e=Math.max(...lo),k=.974;
+ const s=Math.min((W-2*p)/(((e-c)*k)||1),(H-2*p)/((b-a)||1));
+ const ox=(W-(e-c)*k*s)/2,oy=(H-(b-a)*s)/2,X=q=>ox+(q[1]-c)*k*s,Y=q=>oy+(b-q[0])*s;
+ const on=new Set(near.map(n=>n.n));
+ let g=`<line class="ml" x1="${X(ll)}" y1="${Y(ll)}" x2="${X(near[0].ll)}" y2="${Y(near[0].ll)}"/>`;
+ CENTRES.forEach(m=>{const x=X(m.ll),y=Y(m.ll),r=x>W-40;
+  g+=`<rect class="mc${on.has(m.n)?' on':''}" x="${x-5}" y="${y-5}" width="10" height="10"/><text class="mt" x="${r?x-9:x+9}" y="${y+4}" text-anchor="${r?'end':'start'}">${m.n.slice(-1)}</text>`;});
+ const ux=X(ll),uy=Y(ll),r=ux>W-40;
+ g+=`<circle class="me" cx="${ux}" cy="${uy}" r="6"/><text class="mt" x="${r?ux-10:ux+10}" y="${uy-8}" text-anchor="${r?'end':'start'}">You</text>`;
+ return `<svg class="map" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of your area and the drop points, with the nearest suitable point joined by a dashed line">${g}</svg>
+ <div class="legend"><span><i class="sw me"></i>You</span><span><i class="sw on"></i>Suggested point</span><span><i class="sw"></i>Other point</span></div>`;
+}
+
+/* ---------- state and storage ---------- */
+let items=[],swaps=[],cur=null,DB=null,mode='loading',RO=false,slotFull=false,ADMIN=false,mine=[],points={},notice=null;
+const SEED=[
+ {id:'ECT-2611-0412',key:'laptop',qty:3,act:'recycle',kg:6.6,stage:3,centre:'Sample Drop Point A',dept:'CSE',hand:'Drop-off',pd:'',ps:'',ex:1,ts:1793000000000},
+ {id:'ECT-2611-0377',key:'pbank',qty:12,act:'hold',kg:3,stage:1,centre:'Sample Drop Point E',dept:'ECE',hand:'Pickup 9 Nov, 10:00–12:00',pd:'2026-11-09',ps:'10:00–12:00',ex:1,ts:1792900000000},
+ {id:'ECT-2611-0455',key:'printer',qty:2,act:'recycle',kg:12,stage:0,centre:'Sample Drop Point C',dept:'Civil',hand:'Pickup 9 Nov, 10:00–12:00',pd:'2026-11-09',ps:'10:00–12:00',ex:1,ts:1792800000000},
+ {id:'ECT-2611-0456',key:'pc',qty:3,act:'recycle',kg:27,stage:0,centre:'Sample Drop Point E',dept:'Hostel / Admin',hand:'Pickup 9 Nov, 10:00–12:00',pd:'2026-11-09',ps:'10:00–12:00',ex:1,ts:1792700000000},
+ {id:'ECT-2610-0291',key:'monitor',qty:4,act:'refurb',kg:18,stage:4,centre:'Sample Drop Point B',dept:'ISE',hand:'Pickup 29 Oct, 12:00–14:00',pd:'2026-10-29',ps:'12:00–14:00',ex:1,ts:1792600000000},
+ {id:'ECT-2610-0188',key:'board',qty:25,act:'recycle',kg:7.5,stage:4,centre:'Sample Drop Point A',dept:'EEE',hand:'Drop-off',pd:'',ps:'',ex:1,ts:1792500000000},
+ {id:'ECT-2610-0102',key:'phone',qty:6,act:'reuse',kg:1.02,stage:2,centre:'Sample Drop Point D',dept:'Mechanical',hand:'Drop-off',pd:'',ps:'',ex:1,ts:1792400000000}
+];
+const SWSEED=[
+ {id:'S-101',key:'laptop',qty:2,age:4,area:'JP Nagar',dept:'CSE',claimed:0,ex:1,ts:1793000000000},
+ {id:'S-102',key:'monitor',qty:3,age:7,area:'Jayanagar',dept:'ISE',claimed:0,ex:1,ts:1792900000000},
+ {id:'S-103',key:'phone',qty:1,age:3,area:'Koramangala',dept:'Civil',claimed:1,ex:1,ts:1792800000000}
+];
+const okItem=x=>x&&DEV[x.key]&&ACT[x.act]&&typeof x.kg==='number';
+function loadLocal(){
+ try{const a=JSON.parse(localStorage.getItem('ect3-items')||'null');if(Array.isArray(a)&&a.every(okItem))items=a;}catch(e){}
+ try{const a=JSON.parse(localStorage.getItem('ect3-swaps')||'null');if(Array.isArray(a)&&a.every(x=>x&&DEV[x.key]))swaps=a;}catch(e){}
+ if(!items.length)items=SEED.map(x=>({...x}));
+ if(!swaps.length)swaps=SWSEED.map(x=>({...x}));
+}
+function saveLocal(){try{localStorage.setItem('ect3-items',JSON.stringify(items));localStorage.setItem('ect3-swaps',JSON.stringify(swaps));}catch(e){}}
+function setMode(m){
+ mode=m;
+ const t={loading:['Connecting to shared database…',''],shared:['Saved to the shared database'+(RO?' · view only':''),'ok'],local:['Saved in this browser only',''],slow:['Shared database is slow to answer; data may be out of date','warn']}[m];
+ $('store').textContent=t[0];$('store').className='pill '+t[1];
+ $('dataLive').textContent=m==='shared'?'Right now this page is using the shared database attached to it. Records are saved there and every viewer sees the same data.':
+  m==='local'?'Right now the shared database is not available, so records are kept in this browser only (localStorage) and are not visible to anyone else.':
+  m==='slow'?'The shared database has not answered yet. Data shown may be out of date.':'Connecting to the shared database…';
+}
+function flash(t){$('msg').textContent=t;}
+const dis=()=>RO?'disabled':'';
+async function putItem(x){
+ if(DB){try{await DB.collection('manifests').doc(x.id).set(x);return true;}catch(e){flash('Could not save to the shared database. Adding records needs Contributor access.');return false;}}
+ items.unshift(x);saveLocal();drawAll();return true;
+}
+async function patch(coll,id,data){
+ if(DB){try{await DB.doc(coll+'/'+id).update(data);}catch(e){flash('Could not update the shared record. Changing records needs Contributor access.');}return;}
+ const arr=coll==='manifests'?items:swaps,x=arr.find(y=>y.id===id);if(x){Object.assign(x,data);saveLocal();drawAll();}
+}
+async function putSwap(x){
+ if(DB){try{await DB.collection('swaps').doc(x.id).set(x);return true;}catch(e){flash('Could not save to the shared database. Adding records needs Contributor access.');return false;}}
+ swaps.unshift(x);saveLocal();drawAll();return true;
+}
+async function initStore(){
+ const c=window.claude;let d=null;
+ try{d=c&&c.use?await c.use('db'):null;}catch(e){}
+ if(!d){loadLocal();loadSettingsLocal();setMode('local');drawAll();return;}
+ DB=d;setMode('loading');
+ try{const u=await c.use('user');const w=u?await u.can('data.write'):null;RO=w===false;}catch(e){}
+ $('mk').disabled=RO;
+ const timer=setTimeout(()=>setMode('slow'),10000);
+ const bad=()=>{clearTimeout(timer);DB=null;loadLocal();loadSettingsLocal();setMode('local');drawAll();};
+ try{
+  DB.doc('settings/points').onSnapshot(s=>{points=s.exists?(s.data()||{}):{};applyPoints();drawAll();render();drawPointEditor();},()=>{});
+  DB.doc('settings/notice').onSnapshot(s=>{notice=s.exists?s.data():null;drawNotice();},()=>{});
+ }catch(e){}
+ let got=0;
+ const ready=()=>{if(++got>=2){clearTimeout(timer);setMode('shared');}};
+ try{
+  DB.collection('manifests').orderBy('ts','desc').onSnapshot(s=>{items=s.docs.map(x=>({...x.data(),id:x.id})).filter(okItem);if(got<2)ready();drawAll();},bad);
+  DB.collection('swaps').orderBy('ts','desc').onSnapshot(s=>{swaps=s.docs.map(x=>({...x.data(),id:x.id})).filter(x=>DEV[x.key]);if(got<2)ready();drawAll();},bad);
+ }catch(e){bad();}
+}
+const pts=x=>Math.round(x.kg*ACT[x.act].f*(x.stage===4?1.2:1));
+
+/* ---------- assess ---------- */
+$('dev').innerHTML=Object.entries(DEV).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+$('dev').value='laptop';
+const areaOpts=Object.keys(AREAS).map(a=>`<option>${a}</option>`).join('');
+$('area').innerHTML=areaOpts;$('parea').innerHTML=areaOpts;
+$('dept').innerHTML=DEPTS.map(a=>`<option>${a}</option>`).join('');
+$('fdept').innerHTML='<option value="all">All departments</option>'+DEPTS.map(a=>`<option>${a}</option>`).join('');
+$('pdate').value=isoPlus(1);$('pdate').min=isoPlus(1);
+let pkNote='';
+function fixDate(){
+ const v=$('pdate').value;pkNote='';
+ if(!v)return;
+ if(new Date(v+'T00:00:00Z').getUTCDay()===0){
+  const d=new Date(v+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+1);$('pdate').value=d.toISOString().slice(0,10);
+  pkNote='No pickups on Sundays. The date moved to Monday.';}
+}
+function slotUpdate(){
+ const date=$('pdate').value,sel=$('pslot');let first=null;
+ [...sel.options].forEach(o=>{
+  const n=items.filter(x=>x.pd===date&&x.ps===o.value).length;
+  o.textContent=`${o.value} (${n>=CAP?'full':(CAP-n)+' left'})`;o.disabled=n>=CAP;
+  if(!o.disabled&&first===null)first=o.value;});
+ if(sel.selectedOptions[0]&&sel.selectedOptions[0].disabled&&first!==null)sel.value=first;
+ slotFull=first===null;
+}
+function handText(){
+ if($('hand').value!=='pickup')return 'Drop-off';
+ return `Pickup ${$('pdate').value?dmy($('pdate').value):'date to be set'}, ${$('pslot').value}`;
+}
+function render(){
+ const key=$('dev').value,d=DEV[key];
+ const qty=Math.max(1,Math.min(50,+$('qty').value||1)),age=Math.max(0,+$('age').value||0);
+ const cond=$('cond').value;
+ $('quoteRow').hidden=cond!=='minor';
+ $('pkRow').hidden=$('hand').value!=='pickup';
+ $('sw').disabled=!d.bat;$('swLbl').classList.toggle('off',!d.bat);if(!d.bat)$('sw').checked=false;
+ slotUpdate();
+ const dec=decide(d,age,cond,$('sw').checked,+$('rq').value||0,+$('np').value||0);
+ const near=nearest(d,dec,AREAS[$('area').value]);
+ const kg=+(d.kg*qty).toFixed(2);
+ const hints=[];
+ if(kg>=10)hints.push(`This load is ${kg} kg. Pickup is recommended for anything above 10 kg.`);
+ if($('hand').value==='pickup'){if(pkNote)hints.push(pkNote);if(slotFull)hints.push('All slots on this date are full. Choose another date.');}
+ $('pkHint').textContent=hints.join(' ');
+ cur={key,qty,dec,kg,centre:near[0].n,age};
+ let mats='';
+ if(dec.k==='recycle'||dec.k==='hold'){
+  const c=co2(key,qty);
+  mats=`<div class="sec"><h3>Recoverable material (indicative)</h3><div class="tablewrap"><table><thead><tr><th>Material</th><th class="num">${qty} × unit</th></tr></thead><tbody>${
+   Object.entries(d.mat).map(([m,g])=>`<tr><td>${m}</td><td class="num">${fmt(g*qty)}</td></tr>`).join('')}</tbody></table></div>
+   <p class="note">Hazard to manage: ${d.haz}.</p>
+   <p>Recycling the metals and plastics here avoids roughly <b>${c.toFixed(1)} kg CO₂e</b> compared with new material. This is a rough estimate for comparison only.</p></div>`;
+ }else{
+  const ext={reuse:3,refurb:2,repair:2}[dec.k];
+  mats=`<div class="sec"><h3>Material impact</h3><p>The ${kg} kg of material stays in use. Assumed extra service life: about ${ext} years, so recycling is postponed and new manufacturing is avoided.</p></div>`;
+ }
+ const wipe=d.data?`<li>Back up and factory-reset the device to erase personal data</li>`:'';
+ const listBtn=(dec.k==='reuse'||dec.k==='refurb')?`<button type="button" class="ghost" data-list="1" ${dis()}>List on swap board</button>`:'';
+ $('slip').innerHTML=`
+  <div class="slip-head"><span class="eyebrow">Decision slip</span><span class="badge ${dec.w?'warn':''}">${d.n} × ${qty} · ${kg} kg</span></div>
+  <div><div class="verdict">${dec.t}</div><p class="why">${dec.why}</p></div>
+  <div class="sec"><h3>What to do</h3><ul class="steps">${dec.steps.map(s=>`<li>${s}</li>`).join('')}${wipe}</ul>${listBtn?`<div class="btns">${listBtn}</div>`:''}</div>
+  ${mats}
+  <div class="sec"><h3>Nearest suitable drop points</h3>${mapSvg(AREAS[$('area').value],near)}${near.map(c=>{const o=openState(c);return `<div class="centre"><div>${c.n}<small>${c.s}</small><small>${dayRange(c.hrs.d)} ${c.hrs.o}–${c.hrs.c} · ${o.t}</small><small>${c.bat?'Accepts batteries':'No batteries'} · ${c.reuse?'Accepts reuse items':'Recycling only'} · <a href="${dirLink(c)}" target="_blank" rel="noopener">Directions</a></small></div><span class="dist">${c.d.toFixed(1)} km</span></div>`;}).join('')}
+  <p class="note">Sample points and hours. The full system loads the official authorised-recycler list.</p></div>`;
+}
+['dev','qty','age','cond','area','dept','sw','hand','pslot','rq','np'].forEach(i=>$(i).addEventListener('input',()=>{if(i==='area')$('parea').value=$('area').value;render();drawPlaces();}));
+$('pdate').addEventListener('input',()=>{fixDate();render();});
+
+$('f').addEventListener('submit',async e=>{e.preventDefault();if(!cur||RO)return;
+ const pick=$('hand').value==='pickup';
+ if(pick&&slotFull){flash('All pickup slots on that date are full. Choose another date.');return;}
+ const t=ist(),id='ECT-'+String(t.y).slice(2)+String(t.m).padStart(2,'0')+'-'+String(Math.floor(Math.random()*9000)+1000);
+ const x={id,key:cur.key,qty:cur.qty,act:cur.dec.k,kg:cur.kg,stage:0,centre:cur.centre,dept:$('dept').value,hand:handText(),pd:pick?$('pdate').value:'',ps:pick?$('pslot').value:'',ex:0,ts:Date.now()};
+ if(await putItem(x)){mine.push(id);try{localStorage.setItem('ect3-mine',JSON.stringify(mine));}catch(err){}drawTracker();flash('Manifest '+id+' created. Open the Tracker tab to follow it.');}});
+
+/* ---------- places ---------- */
+function drawPlaces(){
+ const t=ist();$('clock').textContent=`Now: ${DN[t.wd]} ${t.hh}:${t.mm} India time. Open or closed status is worked out from this.`;
+ const ll=AREAS[$('parea').value||$('area').value],f=$('pfilter').value;
+ let list=CENTRES.map(c=>({...c,d:km(ll,c.ll),o:openState(c)}));
+ if(f==='open')list=list.filter(c=>c.o.open);else if(f==='bat')list=list.filter(c=>c.bat);else if(f==='reuse')list=list.filter(c=>c.reuse);
+ list.sort((a,b)=>a.d-b.d);
+ $('places').innerHTML=list.map(c=>`<div class="item"><div class="item-top"><b>${c.n}</b><span class="badge ${c.o.open?'':'warn'}">${c.o.open?'Open':'Closed'}</span></div>
+  <p class="note">${c.s}</p><p>${dayRange(c.hrs.d)}, ${c.hrs.o}–${c.hrs.c}</p><p class="note">${c.o.t}</p>
+  <p class="note">${c.bat?'Accepts batteries':'No batteries'} · ${c.reuse?'Accepts reuse items':'Recycling only'} · ${c.d.toFixed(1)} km</p>
+  <div class="btns"><a href="${dirLink(c)}" target="_blank" rel="noopener">Directions</a></div></div>`).join('')||'<p class="note">No points match this filter right now.</p>';
+ $('drives').innerHTML=DRIVES.map(r=>`<div class="item drive"><b>${r.n}</b><p>${r.rule}, ${r.time}</p><p class="note">${r.at} · ${r.what}</p>
+  <div class="dates">${nextDrives(r,3).map(x=>`<span>${x}</span>`).join('')}</div></div>`).join('');
+}
+$('parea').addEventListener('input',()=>{$('area').value=$('parea').value;render();drawPlaces();});
+$('pfilter').addEventListener('input',drawPlaces);
+
+/* ---------- tracker ---------- */
+function itemHtml(x,tag){
+ const pre='rc'+tag+x.id;
+ return `<div class="item"><div class="item-top"><span class="mono">${x.id}${x.ex?' · Example':''}</span><span>${DEV[x.key].n} × ${x.qty} · ${ACT[x.act].t}</span></div>
+  <div class="track">${STAGES.map((s,j)=>`<div class="stg ${j<=x.stage?'done':''}">${s}</div>`).join('')}</div>
+  <div class="item-top"><span class="note">${x.dept} · ${x.centre} · ${x.hand} · ${x.kg} kg · ${pts(x)} pts</span>
+  <span class="btns">${x.stage<4?(ADMIN?`<button type="button" class="ghost" data-adv="${x.id}" ${dis()}>Advance stage</button>`:`<span class="badge warn">${STAGES[x.stage]}</span>`):'<span class="badge">Complete</span>'}<button type="button" class="ghost" data-copy="${x.id}" data-pre="${pre}">Copy receipt</button></span></div>
+  <pre class="rc" id="${pre}" hidden></pre></div>`;
+}
+function receipt(x){return `E-Cycle Trace receipt\nID: ${x.id}\nItem: ${DEV[x.key].n} x ${x.qty} (${x.kg} kg)\nAction: ${ACT[x.act].t}\nDepartment: ${x.dept}\nHandover: ${x.hand}\nPoint: ${x.centre}\nStatus: ${STAGES[x.stage]}`;}
+function drawTracker(){
+ const vis=ADMIN?items:items.filter(x=>mine.includes(x.id));
+ const tot=vis.reduce((s,x)=>s+x.kg,0),rec=vis.filter(x=>x.stage===4).reduce((s,x)=>s+x.kg,0);
+ $('stats').innerHTML=`<div class="stat"><b>${vis.length}</b><span>manifests</span></div>
+  <div class="stat"><b>${tot.toFixed(1)}</b><span>kg logged</span></div>
+  <div class="stat"><b>${rec.toFixed(1)}</b><span>kg fully processed</span></div>
+  <div class="stat"><b>${tot?Math.round(rec/tot*100):0}%</b><span>of weight processed</span></div>`;
+ const by={};vis.forEach(x=>by[x.key]=(by[x.key]||0)+x.kg);
+ const mx=Math.max(1,...Object.values(by));
+ $('bars').innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar"><span>${DEV[k].n}</span><i style="width:${v/mx*100}%"></i><em>${v.toFixed(1)}</em></div>`).join('')||'<p class="note">Nothing logged yet.</p>';
+ const fd=$('fdept').value,fs=$('fstat').value;
+ const shown=vis.filter(x=>(fd==='all'||x.dept===fd)&&(fs==='all'||(fs==='done')===(x.stage===4)));
+ $('items').innerHTML=shown.map(x=>itemHtml(x,'')).join('')||`<p class="note">${ADMIN?'No manifests match.':'You have not created a manifest in this browser yet. Create one in the Assess tab, or look one up by ID above.'}</p>`;
+ $('trkTitle').textContent=ADMIN?'All manifests':'My manifests';
+ $('exportRow').hidden=!ADMIN;
+ $('trkNote').textContent=ADMIN?'Rows marked Example are sample data. "Advance stage" simulates the recycler updating the status.':'You see the manifests created in this browser. Anyone can look up a manifest by its ID.';
+ lookup();
+}
+function lookup(){
+ const q=$('tid').value.trim().toUpperCase();
+ if(!q){$('found').innerHTML='<p class="note">Type an ID to see its live status.</p>';return;}
+ const hits=items.filter(x=>x.id.toUpperCase().includes(q));
+ $('found').innerHTML=hits.length?hits.map(x=>itemHtml(x,'f')).join(''):'<p class="note">No manifest matches that ID.</p>';
+}
+$('tid').addEventListener('input',lookup);
+$('fdept').addEventListener('input',drawTracker);$('fstat').addEventListener('input',drawTracker);
+
+/* ---------- swap board ---------- */
+function drawSwap(){
+ $('swapList').innerHTML=swaps.map(s=>`<div class="item"><div class="item-top"><b>${DEV[s.key].n} × ${s.qty}</b><span class="badge ${s.claimed?'warn':''}">${s.claimed?'Claimed':'Available'}</span></div>
+  <p class="note">${s.age} years old · ${s.area} · from ${s.dept}${s.ex?' · Example':''}</p>
+  ${s.claimed?'':`<div class="btns"><button type="button" data-claim="${s.id}" ${dis()}>Claim</button></div>`}</div>`).join('')||'<p class="note">Nothing listed yet. Use "List on swap board" in the Assess tab.</p>';
+}
+
+/* ---------- campus ---------- */
+function drawCampus(){
+ const kg=items.reduce((s,x)=>s+x.kg,0);
+ const kept=items.filter(x=>['reuse','refurb','repair'].includes(x.act)).reduce((s,x)=>s+x.kg,0);
+ const rc=items.filter(x=>x.act==='recycle'||x.act==='hold');
+ let c=0;const m={};
+ rc.forEach(x=>{c+=co2(x.key,x.qty);for(const[k,g]of Object.entries(DEV[x.key].mat))m[k]=(m[k]||0)+g*x.qty;});
+ const batt=items.filter(x=>DEV[x.key].bat).reduce((s,x)=>s+x.qty,0);
+ $('cstats').innerHTML=`<div class="stat"><b>${kg.toFixed(1)}</b><span>kg of e-waste logged</span></div>
+  <div class="stat"><b>${kg?Math.round(kept/kg*100):0}%</b><span>kept in use (reuse, refurbish, repair)</span></div>
+  <div class="stat"><b>${c.toFixed(0)}</b><span>kg CO₂e avoided (rough)</span></div>
+  <div class="stat"><b>${batt}</b><span>battery devices handled safely</span></div>`;
+ const show=['Copper','Aluminium','Iron / steel','Plastics','Cobalt','Silver','Gold'].filter(k=>m[k]);
+ $('cmat').innerHTML=show.map(k=>`<div><b>${fmt(m[k])}</b><span>${k}</span></div>`).join('')||'<p class="note">No recycling logged yet.</p>';
+ $('cnote').textContent='Based on typical per-unit composition of items sent for recycling. Indicative only.';
+ const by={};DEPTS.forEach(d=>by[d]=0);items.forEach(x=>by[x.dept]=(by[x.dept]||0)+pts(x));
+ swaps.filter(s=>s.claimed&&!s.ex).forEach(s=>by[s.dept]=(by[s.dept]||0)+5);
+ const mx=Math.max(1,...Object.values(by));
+ $('lead').innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>`<div class="bar"><span>${i+1}. ${k}</span><i style="width:${v/mx*100}%"></i><em>${v}</em></div>`).join('');
+ $('counts').textContent=`Currently stored: ${items.length} manifests and ${swaps.length} swap listings.`;
+}
+
+/* ---------- quiz ---------- */
+let qa={};
+function drawQuiz(){
+ $('quiz').innerHTML=QZ.map((z,i)=>{const ch=qa[i],done=ch!==undefined;
+  return `<div class="item"><h3>${i+1}. ${z.q}</h3><div class="opts">${z.o.map((o,j)=>`<button type="button" class="opt ${done?(j===z.a?'right':(j===ch?'wrong':'')):''}" data-q="${i}" data-o="${j}" ${done?'disabled':''}>${o}</button>`).join('')}</div>${done?`<p class="note">${ch===z.a?'Correct. ':'Not quite. '}${z.e}</p>`:''}</div>`;}).join('');
+ const n=Object.keys(qa).length,sc=Object.entries(qa).filter(([i,c])=>QZ[i].a===c).length;
+ $('qscore').textContent=n?`Score: ${sc} of ${QZ.length}${n===QZ.length?' (finished)':''}`:'Answer the questions to see your score.';
+}
+
+/* ---------- export ---------- */
+function csvEsc(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+async function exportCsv(){
+ const head=['id','device','quantity','kg','action','stage','department','drop_point','handover','eco_points','example'];
+ const rows=items.map(x=>[x.id,DEV[x.key].n,x.qty,x.kg,ACT[x.act].t,STAGES[x.stage],x.dept,x.centre,x.hand,pts(x),x.ex?'yes':'no']);
+ const csv=[head,...rows].map(r=>r.map(csvEsc).join(',')).join('\n');
+ let dl=null;try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;}catch(e){}
+ if(!dl){flash('Saving files is not available in this view.');return;}
+ try{await dl.save({filename:'ecycle-manifests.csv',data:csv});}catch(e){if(!e||e.code!=='declined')flash('The file could not be saved.');}
+}
+
+function drawAll(){slotUpdate();drawTracker();drawSwap();drawCampus();drawPlaces();drawAdmin();}
+
+/* ---------- roles, settings, admin ---------- */
+CENTRES.forEach(c=>c.base={...c.hrs});
+const amsg=t=>{$('amsg').textContent=t;};
+function applyPoints(){CENTRES.forEach(c=>{const o=points[c.n.slice(-1)]||{};c.hrs={d:c.base.d,o:o.o||c.base.o,c:o.c||c.base.c};c.off=!!o.off;});}
+function loadSettingsLocal(){
+ try{points=JSON.parse(localStorage.getItem('ect3-points')||'{}')||{};}catch(e){points={};}
+ try{notice=JSON.parse(localStorage.getItem('ect3-notice')||'null');}catch(e){notice=null;}
+ applyPoints();drawNotice();
+}
+async function saveSetting(id,data){
+ if(DB){try{await DB.doc('settings/'+id).set(data);return true;}catch(e){amsg('Could not save to the shared database.');return false;}}
+ try{localStorage.setItem('ect3-'+id,JSON.stringify(data));}catch(e){}
+ if(id==='points'){points=data;applyPoints();}else notice=data;
+ drawAll();drawNotice();return true;
+}
+function drawNotice(){
+ const n=$('notice');if(notice&&notice.text){n.textContent='Notice: '+notice.text;n.hidden=false;}else n.hidden=true;
+ const i=$('ntext');if(i&&document.activeElement!==i)i.value=(notice&&notice.text)||'';
+}
+try{mine=JSON.parse(localStorage.getItem('ect3-mine')||'[]')||[];}catch(e){mine=[];}
+try{ADMIN=sessionStorage.getItem('ect3-admin')==='1';}catch(e){}
+function setRole(a){
+ ADMIN=a;try{a?sessionStorage.setItem('ect3-admin','1'):sessionStorage.removeItem('ect3-admin');}catch(e){}
+ $('role').textContent=a?'Admin view':'Customer view';$('role').className='pill '+(a?'ok':'');
+ $('roleBtn').textContent=a?'Switch to customer view':'Admin sign in';
+ $('adminLogin').hidden=a;$('adminConsole').hidden=!a;
+ drawAll();if(a)drawPointEditor();
+}
+function goTab(n){
+ document.querySelectorAll('#tabs button').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab===n));
+ document.querySelectorAll('.pane').forEach(p=>p.hidden=p.id!=='pane-'+n);
+ if(n==='places')drawPlaces();if(n==='admin')drawAdmin();
+}
+function qItem(x){return `<div class="item"><div class="item-top"><b>${x.pd?dmy(x.pd)+' · '+x.ps:ACT[x.act].t}</b><span class="mono">${x.id}</span></div><p>${DEV[x.key].n} × ${x.qty} · ${x.kg} kg · ${x.dept}</p>
+ <div class="item-top"><span class="note">To ${x.centre} · now: ${STAGES[x.stage]}</span><div class="btns"><button type="button" class="ghost" data-adv="${x.id}">Advance stage</button></div></div></div>`;}
+function drawAdmin(){
+ if(!ADMIN||!$('pickQ'))return;
+ const pk=items.filter(x=>x.pd&&x.stage<4).sort((a,b)=>(a.pd+a.ps).localeCompare(b.pd+b.ps));
+ $('pickQ').innerHTML=pk.map(qItem).join('')||'<p class="note">No pending pickups.</p>';
+ const hz=items.filter(x=>x.act==='hold'&&x.stage<4);
+ $('hazQ').innerHTML=hz.map(qItem).join('')||'<p class="note">No hazard items waiting.</p>';
+}
+function drawPointEditor(){
+ if(!ADMIN||!$('ptEd'))return;
+ $('ptEd').innerHTML=CENTRES.map(c=>{const k=c.n.slice(-1);
+  return `<div class="pt"><div class="nm"><b>${c.n}</b><div class="note">${c.s}</div></div>
+  <div class="field"><label for="po${k}">Opens</label><input id="po${k}" type="time" value="${c.hrs.o}"></div>
+  <div class="field"><label for="pc${k}">Closes</label><input id="pc${k}" type="time" value="${c.hrs.c}"></div>
+  <label class="check"><input type="checkbox" id="pf${k}" ${c.off?'checked':''}> Closed</label>
+  <button type="button" class="ghost" data-savept="${k}">Save</button></div>`;}).join('');
+}
+$('pinForm').addEventListener('submit',e=>{e.preventDefault();
+ if($('pin').value.trim()==='2026'){$('pin').value='';$('pinMsg').textContent='Demo PIN: 2026.';setRole(true);}
+ else $('pinMsg').textContent='Wrong PIN. Try again.';});
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.adv){const x=items.find(y=>y.id===t.dataset.adv);if(x&&x.stage<4)await patch('manifests',x.id,{stage:x.stage+1});}
+ else if(t.dataset.copy){const x=items.find(y=>y.id===t.dataset.copy),pre=$(t.dataset.pre);if(!x||!pre)return;
+  const txt=receipt(x),show=()=>{pre.textContent=txt;pre.hidden=false;};
+  try{navigator.clipboard.writeText(txt).then(()=>{t.textContent='Copied';setTimeout(()=>t.textContent='Copy receipt',1500);},show);}catch(err){show();}}
+ else if(t.dataset.claim){const s=swaps.find(y=>y.id===t.dataset.claim);if(s&&!s.claimed)await patch('swaps',s.id,{claimed:1});}
+ else if(t.dataset.list){if(!cur)return;
+  const ok=await putSwap({id:'S-'+Math.floor(Math.random()*9000+1000),key:cur.key,qty:cur.qty,age:cur.age,area:$('area').value,dept:$('dept').value,claimed:0,ex:0,ts:Date.now()});
+  if(ok)flash('Listed on the swap board.');}
+ else if(t.dataset.export){exportCsv();}
+ else if(t.dataset.q!==undefined){qa[+t.dataset.q]=+t.dataset.o;drawQuiz();}
+ else if(t.dataset.qreset){qa={};drawQuiz();}
+ else if(t.dataset.role){if(ADMIN){setRole(false);goTab('assess');}else goTab('admin');}
+ else if(t.dataset.goto){goTab(t.dataset.goto);}
+ else if(t.dataset.npub||t.dataset.nclr){const v=t.dataset.npub?$('ntext').value.trim().slice(0,160):'';
+  if(await saveSetting('notice',{text:v,ts:Date.now()}))amsg(v?'Notice published.':'Notice cleared.');}
+ else if(t.dataset.savept){const k=t.dataset.savept,o=$('po'+k).value,c=$('pc'+k).value;
+  if(!o||!c||o>=c){amsg('The opening time must be before the closing time.');return;}
+  if(await saveSetting('points',{...points,[k]:{o,c,off:$('pf'+k).checked?1:0}}))amsg('Saved hours for Point '+k+'.');}
+});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b)goTab(b.dataset.tab);});
+
+render();drawQuiz();drawPlaces();setRole(ADMIN);
+initStore();
+</script>
